@@ -2,6 +2,7 @@ import java.util.Scanner;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.InputMismatchException;
+import java.util.concurrent.*;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -17,6 +18,8 @@ import java.util.InputMismatchException;
  */
 
 public class Server extends Thread {
+
+    static Semaphore semaphore = new Semaphore(2);
 
     /* NEW : Shared member variables are now static for the 2 receiving threads */
     private static int numberOfTransactions; /* Number of transactions handled by the server */
@@ -319,7 +322,10 @@ public class Server extends Thread {
      */
 
     public double deposit(int i, double amount) {
-        double curBalance; /* Current account balance */
+        try {
+            semaphore.acquire();
+
+            double curBalance; /* Current account balance */
 
         curBalance = account[i].getBalance(); /* Get current account balance */
 
@@ -331,7 +337,7 @@ public class Server extends Thread {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
-
+                e.printStackTrace();
             }
         }
 
@@ -339,6 +345,12 @@ public class Server extends Thread {
                 + amount + " " + getServerThreadId());
 
         account[i].setBalance(curBalance + amount); /* Deposit amount in the account */
+            
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            semaphore.release();
+        }
         return account[i].getBalance(); /* Return updated account balance */
     }
 
@@ -350,16 +362,22 @@ public class Server extends Thread {
      */
 
     public double withdraw(int i, double amount) {
-        double curBalance; /* Current account balance */
+        try {
+            semaphore.acquire();
+            double curBalance; /* Current account balance */
 
-        curBalance = account[i].getBalance(); /* Get current account balance */
+            curBalance = account[i].getBalance(); /* Get current account balance */
 
-        System.out.println("\n DEBUG : Server.withdraw - " + "i " + i + " Current balance " + curBalance + " Amount "
-                + amount + " " + getServerThreadId());
+            System.out.println("\n DEBUG : Server.withdraw - " + "i " + i + " Current balance " + curBalance
+                    + " Amount " + amount + " " + getServerThreadId());
 
-        account[i].setBalance(curBalance - amount); /* Withdraw amount in the account */
+            account[i].setBalance(curBalance - amount); /* Withdraw amount in the account */
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            semaphore.release();
+        }
         return account[i].getBalance(); /* Return updated account balance */
-
     }
 
     /**
@@ -409,7 +427,6 @@ public class Server extends Thread {
                     .println("\n DEBUG : Server.run() - starting server thread " + Network.getServerConnectionStatus());
 
             processTransactions(trans);
-
             serverEndTime = System.currentTimeMillis();
             System.out.println("\n Terminating server thread1" + " Running time " + (serverEndTime - serverStartTime)
                     + " milliseconds");
@@ -428,7 +445,7 @@ public class Server extends Thread {
             serverEndTime = System.currentTimeMillis();
             System.out.println("\n Terminating server thread2 " + " Running time " + (serverEndTime - serverStartTime)
                     + " milliseconds");
-           
+
             setServerThreadRunningStatus2("terminated");
         }
 
