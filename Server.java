@@ -398,11 +398,19 @@ public class Server extends Thread {
 
     public double query(int i) {
         double curBalance; /* Current account balance */
+        try {
+            semaphore.acquire();
+            curBalance = account[i].getBalance();
 
-        curBalance = account[i].getBalance(); /* Get current account balance */
+            System.out.println("\n DEBUG : Server.query - " + "i " + i + " Current balance " + curBalance + " "
+                    + getServerThreadId());
 
-        System.out.println(
-                "\n DEBUG : Server.query - " + "i " + i + " Current balance " + curBalance + " " + getServerThreadId());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            curBalance = account[i].getBalance();
+            semaphore.release();
+        }
 
         return curBalance; /* Return current account balance */
     }
