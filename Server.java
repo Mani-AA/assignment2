@@ -266,55 +266,35 @@ public class Server extends Thread {
                 accIndex = findAccount(trans.getAccountNumber());
                 /* Process deposit operation */
                 if (trans.getOperationType().equals("DEPOSIT")) {
-                    try {
-                        semaphore.acquire();
-                        newBalance = deposit(accIndex, trans.getTransactionAmount());
-                        trans.setTransactionBalance(newBalance);
-                        trans.setTransactionStatus("done");
+                    newBalance = deposit(accIndex, trans.getTransactionAmount());
+                    trans.setTransactionBalance(newBalance);
+                    trans.setTransactionStatus("done");
 
-                        System.out.println("\n DEBUG : Server.processTransactions() - Deposit of "
-                                + trans.getTransactionAmount() + " in account " + trans.getAccountNumber());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
-                        semaphore.release();
-                    }
+                    System.out.println("\n DEBUG : Server.processTransactions() - Deposit of "
+                            + trans.getTransactionAmount() + " in account " + trans.getAccountNumber());
 
                 } else
                 /* Process withdraw operation */
                 if (trans.getOperationType().equals("WITHDRAW")) {
-                    try {
-                        semaphore.acquire();
 
-                        newBalance = withdraw(accIndex, trans.getTransactionAmount());
-                        trans.setTransactionBalance(newBalance);
-                        trans.setTransactionStatus("done");
+                    newBalance = withdraw(accIndex, trans.getTransactionAmount());
+                    trans.setTransactionBalance(newBalance);
+                    trans.setTransactionStatus("done");
 
-                        System.out.println("\n DEBUG : Server.processTransactions() - Withdrawal of "
-                                + trans.getTransactionAmount() + " from account " + trans.getAccountNumber());
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
-                        semaphore.release();
-                    }
+                    System.out.println("\n DEBUG : Server.processTransactions() - Withdrawal of "
+                            + trans.getTransactionAmount() + " from account " + trans.getAccountNumber());
+
                 } else
                 /* Process query operation */
                 if (trans.getOperationType().equals("QUERY")) {
-                    try {
-                        semaphore.acquire();
 
-                        newBalance = query(accIndex);
-                        trans.setTransactionBalance(newBalance);
-                        trans.setTransactionStatus("done");
+                    newBalance = query(accIndex);
+                    trans.setTransactionBalance(newBalance);
+                    trans.setTransactionStatus("done");
 
-                        System.out.println("\n DEBUG : Server.processTransactions() - Obtaining balance from account"
-                                + trans.getAccountNumber());
+                    System.out.println("\n DEBUG : Server.processTransactions() - Obtaining balance from account"
+                            + trans.getAccountNumber());
 
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
-                        semaphore.release();
-                    }
                 }
 
                 while (Network.getOutBufferStatus().equals("full")) {
@@ -349,25 +329,35 @@ public class Server extends Thread {
     public double deposit(int i, double amount) {
         double curBalance; /* Current account balance */
 
-        curBalance = account[i].getBalance(); /* Get current account balance */
+        try {
+            semaphore.acquire();
 
-        /*
-         * NEW : A server thread is blocked before updating the 10th , 20th, ... 70th
-         * account balance in order to simulate an inconsistency situation
-         */
-        if (((i + 1) % 10) == 0) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            curBalance = account[i].getBalance(); /* Get current account balance */
+
+            /*
+             * NEW : A server thread is blocked before updating the 10th , 20th, ... 70th
+             * account balance in order to simulate an inconsistency situation
+             */
+            if (((i + 1) % 10) == 0) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
+
+            System.out.println("\n DEBUG : Server.deposit - " + "i " + i + " Current balance " + curBalance + " Amount "
+                    + amount + " " + getServerThreadId());
+
+            account[i].setBalance(curBalance + amount); /* Deposit amount in the account */
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            curBalance = account[i].getBalance();
+            semaphore.release();
         }
 
-        System.out.println("\n DEBUG : Server.deposit - " + "i " + i + " Current balance " + curBalance + " Amount "
-                + amount + " " + getServerThreadId());
-
-        account[i].setBalance(curBalance + amount); /* Deposit amount in the account */
-        return account[i].getBalance(); /* Return updated account balance */
+        return curBalance; /* Return updated account balance */
     }
 
     /**
@@ -380,13 +370,23 @@ public class Server extends Thread {
     public double withdraw(int i, double amount) {
         double curBalance; /* Current account balance */
 
-        curBalance = account[i].getBalance(); /* Get current account balance */
+        try {
+            semaphore.acquire();
 
-        System.out.println("\n DEBUG : Server.withdraw - " + "i " + i + " Current balance " + curBalance + " Amount "
-                + amount + " " + getServerThreadId());
+            curBalance = account[i].getBalance(); /* Get current account balance */
 
-        account[i].setBalance(curBalance - amount); /* Withdraw amount in the account */
-        return account[i].getBalance(); /* Return updated account balance */
+            System.out.println("\n DEBUG : Server.withdraw - " + "i " + i + " Current balance " + curBalance
+                    + " Amount " + amount + " " + getServerThreadId());
+
+            account[i].setBalance(curBalance - amount); /* Withdraw amount in the account */
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            curBalance = account[i].getBalance();
+            semaphore.release();
+        }
+
+        return curBalance; /* Return updated account balance */
     }
 
     /**
