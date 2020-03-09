@@ -252,7 +252,6 @@ public class Server extends Thread {
 
         /* Process the accounts until the client disconnects */
         while ((!Network.getClientConnectionStatus().equals("disconnected"))) {
-            System.out.println(getServerThreadId() + "still running");
             if (!Network.getInBufferStatus().equals("empty")) {
                 System.out.println("\n DEBUG : Server.processTransactions() - transferring in account "
                         + trans.getAccountNumber());
