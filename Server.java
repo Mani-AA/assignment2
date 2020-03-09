@@ -458,7 +458,7 @@ public class Server extends Thread {
         }
 
         if (getServerThreadRunningStatus1().equals("terminated")) {
-            if (getServerThreadRunningStatus1().equals("terminated")) {
+            if (getServerThreadRunningStatus2().equals("terminated")) {
                 Network.disconnect("216.120.40.10");
             }
         }
