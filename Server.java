@@ -252,6 +252,7 @@ public class Server extends Thread {
 
         /* Process the accounts until the client disconnects */
         while ((!Network.getClientConnectionStatus().equals("disconnected"))) {
+            System.out.println(getServerThreadId() + "still running");
             if (!Network.getInBufferStatus().equals("empty")) {
                 System.out.println("\n DEBUG : Server.processTransactions() - transferring in account "
                         + trans.getAccountNumber());
@@ -427,31 +428,31 @@ public class Server extends Thread {
         String currentThreadID = getServerThreadId();
 
         if (currentThreadID.equals("Thread1")) {
-            Transactions trans = new Transactions();
-            long serverStartTime, serverEndTime;
-            serverStartTime = System.currentTimeMillis();
+            Transactions trans1 = new Transactions();
+            long server1StartTime, server1EndTime;
+            server1StartTime = System.currentTimeMillis();
 
             System.out
                     .println("\n DEBUG : Server.run() - starting server thread " + Network.getServerConnectionStatus());
 
-            processTransactions(trans);
-            serverEndTime = System.currentTimeMillis();
-            System.out.println("\n Terminating server thread1" + " Running time " + (serverEndTime - serverStartTime)
+            processTransactions(trans1);
+            server1EndTime = System.currentTimeMillis();
+            System.out.println("\n Terminating server thread1" + " Running time " + (server1EndTime - server1StartTime)
                     + " milliseconds");
 
             setServerThreadRunningStatus1("terminated");
         } else if (currentThreadID.equals("Thread2")) {
-            Transactions trans = new Transactions();
-            long serverStartTime, serverEndTime;
-            serverStartTime = System.currentTimeMillis();
+            Transactions trans2 = new Transactions();
+            long server2StartTime, server2EndTime;
+            server2StartTime = System.currentTimeMillis();
 
             System.out
                     .println("\n DEBUG : Server.run() - starting server thread " + Network.getServerConnectionStatus());
 
-            processTransactions(trans);
+            processTransactions(trans2);
 
-            serverEndTime = System.currentTimeMillis();
-            System.out.println("\n Terminating server thread2 " + " Running time " + (serverEndTime - serverStartTime)
+            server2EndTime = System.currentTimeMillis();
+            System.out.println("\n Terminating server thread2 " + " Running time " + (server2EndTime - server2StartTime)
                     + " milliseconds");
 
             setServerThreadRunningStatus2("terminated");
