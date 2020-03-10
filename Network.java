@@ -598,8 +598,8 @@ public class Network extends Thread {
      * @param
      */
     public void run() {
-        System.out.println("\n DEBUG : Network.run() - starting network thread");
-
+/*         System.out.println("\n DEBUG : Network.run() - starting network thread");
+ */
         while (true) {
             // The network thread executes an infinite loop that ends when both client and
             // server threads have disconnected.

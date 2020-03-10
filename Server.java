@@ -213,8 +213,8 @@ public class Server extends Thread {
         }
         setNumberOfAccounts(i); /* Record the number of accounts processed */
 
-        System.out.println("\n DEBUG : Server.initializeAccounts() " + getNumberOfAccounts() + " accounts processed");
-
+/*         System.out.println("\n DEBUG : Server.initializeAccounts() " + getNumberOfAccounts() + " accounts processed");
+ */
         inputStream.close();
     }
 
@@ -246,14 +246,14 @@ public class Server extends Thread {
         int accIndex; /* Index position of account to update */
         double newBalance; /* Updated account balance */
 
-        System.out.println("\n DEBUG : Server.processTransactions() " + getServerThreadId());
-
+/*         System.out.println("\n DEBUG : Server.processTransactions() " + getServerThreadId());
+ */
         /* Process the accounts until the client disconnects */
         while ((!Network.getClientConnectionStatus().equals("disconnected"))) {
             if (!Network.getInBufferStatus().equals("empty")) {
-                System.out.println("\n DEBUG : Server.processTransactions() - transferring in account "
+/*                 System.out.println("\n DEBUG : Server.processTransactions() - transferring in account "
                         + trans.getAccountNumber());
-
+ */
                 Network.transferIn(trans); /* Transfer a transaction from the network input buffer */
 
                 accIndex = findAccount(trans.getAccountNumber());
@@ -263,9 +263,9 @@ public class Server extends Thread {
                     trans.setTransactionBalance(newBalance);
                     trans.setTransactionStatus("done");
 
-                    System.out.println("\n DEBUG : Server.processTransactions() - Deposit of "
+                    /* System.out.println("\n DEBUG : Server.processTransactions() - Deposit of "
                             + trans.getTransactionAmount() + " in account " + trans.getAccountNumber());
-
+ */
                 } else
                 /* Process withdraw operation */
                 if (trans.getOperationType().equals("WITHDRAW")) {
@@ -274,9 +274,9 @@ public class Server extends Thread {
                     trans.setTransactionBalance(newBalance);
                     trans.setTransactionStatus("done");
 
-                    System.out.println("\n DEBUG : Server.processTransactions() - Withdrawal of "
+                    /* System.out.println("\n DEBUG : Server.processTransactions() - Withdrawal of "
                             + trans.getTransactionAmount() + " from account " + trans.getAccountNumber());
-
+ */
                 } else
                 /* Process query operation */
                 if (trans.getOperationType().equals("QUERY")) {
@@ -285,13 +285,13 @@ public class Server extends Thread {
                     trans.setTransactionBalance(newBalance);
                     trans.setTransactionStatus("done");
 
-                    System.out.println("\n DEBUG : Server.processTransactions() - Obtaining balance from account"
+                   /*  System.out.println("\n DEBUG : Server.processTransactions() - Obtaining balance from account"
                             + trans.getAccountNumber());
-
+ */
                 }
 
-                System.out.println("\n DEBUG : Server.processTransactions() - transferring out account "
-                        + trans.getAccountNumber());
+                /* System.out.println("\n DEBUG : Server.processTransactions() - transferring out account "
+                        + trans.getAccountNumber()); */
 
                 Network.transferOut(
                         trans); /*
@@ -302,9 +302,9 @@ public class Server extends Thread {
             }
         }
 
-        System.out.println(
+        /* System.out.println(
                 "\n DEBUG : Server.processTransactions() - " + getNumberOfTransactions() + " accounts updated");
-
+ */
         return true;
     }
 
@@ -332,9 +332,9 @@ public class Server extends Thread {
             }
         }
 
-        System.out.println("\n DEBUG : Server.deposit - " + "i " + i + " Current balance " + curBalance + " Amount "
+        /* System.out.println("\n DEBUG : Server.deposit - " + "i " + i + " Current balance " + curBalance + " Amount "
                 + amount + " " + getServerThreadId());
-
+ */
         account[i].setBalance(curBalance + amount); /* Deposit amount in the account */
         curBalance = account[i].getBalance();
 
@@ -353,8 +353,8 @@ public class Server extends Thread {
 
         curBalance = account[i].getBalance(); /* Get current account balance */
 
-        System.out.println("\n DEBUG : Server.withdraw - " + "i " + i + " Current balance " + curBalance + " Amount "
-                + amount + " " + getServerThreadId());
+        /* System.out.println("\n DEBUG : Server.withdraw - " + "i " + i + " Current balance " + curBalance + " Amount "
+                + amount + " " + getServerThreadId()); */
 
         account[i].setBalance(curBalance - amount); /* Withdraw amount in the account */
         curBalance = account[i].getBalance();
@@ -373,9 +373,9 @@ public class Server extends Thread {
         double curBalance; /* Current account balance */
         curBalance = account[i].getBalance();
 
-        System.out.println(
+       /*  System.out.println(
                 "\n DEBUG : Server.query - " + "i " + i + " Current balance " + curBalance + " " + getServerThreadId());
-
+ */
         curBalance = account[i].getBalance();
 
         return curBalance; /* Return current account balance */
@@ -406,9 +406,9 @@ public class Server extends Thread {
             long server1StartTime, server1EndTime;
             server1StartTime = System.currentTimeMillis();
 
-            System.out
+            /* System.out
                     .println("\n DEBUG : Server.run() - starting server thread " + Network.getServerConnectionStatus());
-
+ */
             processTransactions(trans1);
             server1EndTime = System.currentTimeMillis();
             System.out.println("\n Terminating server thread1" + " Running time " + (server1EndTime - server1StartTime)
@@ -420,9 +420,9 @@ public class Server extends Thread {
             long server2StartTime, server2EndTime;
             server2StartTime = System.currentTimeMillis();
 
-            System.out
+            /* System.out
                     .println("\n DEBUG : Server.run() - starting server thread " + Network.getServerConnectionStatus());
-
+ */
             processTransactions(trans2);
 
             server2EndTime = System.currentTimeMillis();
